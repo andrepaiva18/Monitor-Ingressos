@@ -28,8 +28,10 @@ function dumpDomWithBrowser(url) {
 
   const args = [
     '--headless=new', '--disable-gpu', '--no-first-run',
-    '--no-default-browser-check', '--dump-dom',
-    '--virtual-time-budget=15000', url
+    '--no-default-browser-check', '--no-sandbox',
+    '--disable-blink-features=AutomationControlled',
+    '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    '--dump-dom', '--virtual-time-budget=15000', url
   ];
 
   return new Promise((resolve, reject) => {
@@ -162,12 +164,23 @@ class MonitorWorker {
   async detectStatus(link) {
     try {
       const dom = await dumpDomWithBrowser(link.url);
-      const status = classifyStatus(stripHtml(dom));
-      if (status !== 'INCONCLUSIVO') return status;
+      const text = stripHtml(dom);
+      if (text.length > 200) {
+        const status = classifyStatus(text);
+        if (status !== 'INCONCLUSIVO') return status;
+      }
     } catch (error) {
       console.error(`[${nowLabel()}] Browser headless falhou para ${link.url}:`, error.message || error);
     }
-    return classifyStatus(await fetchPageText(link));
+
+    try {
+      const text = await fetchPageText(link);
+      if (text.length > 200) return classifyStatus(text);
+    } catch {
+      // silencioso
+    }
+
+    return 'INCONCLUSIVO';
   }
 }
 
