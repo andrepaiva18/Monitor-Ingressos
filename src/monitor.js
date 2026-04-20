@@ -174,8 +174,17 @@ class MonitorWorker {
     }
 
     try {
-      const text = await fetchPageText(link);
-      if (text.length > 200) return classifyStatus(text);
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), CHECK_TIMEOUT_MS);
+      try {
+        const response = await fetch(link.url, { signal: controller.signal });
+        if (response.ok) {
+          const html = await response.text();
+          if (html.length > 200) return classifyStatus(html);
+        }
+      } finally {
+        clearTimeout(timeout);
+      }
     } catch {
       // silencioso
     }
