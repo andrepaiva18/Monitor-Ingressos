@@ -47,7 +47,7 @@ module.exports = {
     { name: 'Ticketmaster BTS 2', url: 'https://www.ticketmaster.com.br/event/venda-geral-bts-world-tour-arirang-30-10' },
     { name: 'Ticketmaster BTS 3', url: 'https://www.ticketmaster.com.br/event/venda-geral-bts-world-tour-arirang-31-10' }
   ],
-  SOLD_OUT_KEYWORDS: ['ESGOTADO'],
+  SOLD_OUT_KEYWORDS: ['ESGOTADO', 'sold_out', 'soldout', 'sold-out', 'off-sale', 'offsale'],
   AVAILABLE_KEYWORDS: [
     'comprar ingresso', 'comprar ingressos', 'selecionar ingressos',
     'escolha seus ingressos', 'ver ingressos', 'disponivel'
