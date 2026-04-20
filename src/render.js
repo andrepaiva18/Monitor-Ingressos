@@ -8,6 +8,12 @@ function renderPage(title, body) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml(title)}</title>
+  <script>
+    (function() {
+      var t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -339,6 +345,50 @@ function renderPage(title, body) {
       .form-row { grid-template-columns: 1fr; }
       .hero-inner { flex-direction: column; align-items: flex-start; }
     }
+
+    /* ── Dark mode toggle button ── */
+    .dark-toggle {
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 999px;
+      padding: 7px 13px;
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      transition: background .15s;
+    }
+    .dark-toggle:hover { background: rgba(255,255,255,.22); }
+
+    /* ── Dark mode ── */
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #f1f5f9;
+      --text-2: #94a3b8;
+      --text-3: #64748b;
+      --border: #334155;
+      --accent-light: #1e1b4b;
+      --green-light: #064e3b;
+      --amber-light: #451a03;
+      --red-light: #450a0a;
+      --blue-light: #172554;
+    }
+    [data-theme="dark"] input[type="text"],
+    [data-theme="dark"] input[type="url"],
+    [data-theme="dark"] input[type="number"] {
+      background: #0f172a; color: var(--text); border-color: var(--border);
+    }
+    [data-theme="dark"] input[type="text"]:focus,
+    [data-theme="dark"] input[type="url"]:focus,
+    [data-theme="dark"] input[type="number"]:focus { background: #0f172a; }
+    [data-theme="dark"] tbody tr:hover { background: #263244; }
+    [data-theme="dark"] .btn-gray { background: #334155; color: #94a3b8; }
+    [data-theme="dark"] .btn-gray:hover { background: #475569; }
+    [data-theme="dark"] .badge-off { background: #1e293b; color: #64748b; }
+    [data-theme="dark"] .notice { background: #172554; border-color: #1d4ed8; color: #93c5fd; }
+    [data-theme="dark"] .notice.warn { background: #451a03; border-color: #92400e; color: #fcd34d; }
+    [data-theme="dark"] .count-pill { background: #1e1b4b; }
+    [data-theme="dark"] .card-title-icon { background: #1e1b4b; }
   </style>
 </head>
 <body>
@@ -346,13 +396,27 @@ function renderPage(title, body) {
   <script>
     (function() {
       var el = document.getElementById('refresh-countdown');
-      if (!el) return;
-      var secs = 30;
-      var iv = setInterval(function() {
-        secs--;
-        if (secs <= 0) { clearInterval(iv); location.reload(); return; }
-        el.textContent = secs + 's';
-      }, 1000);
+      if (el) {
+        var secs = 30;
+        var iv = setInterval(function() {
+          secs--;
+          if (secs <= 0) { clearInterval(iv); location.reload(); return; }
+          el.textContent = secs + 's';
+        }, 1000);
+      }
+
+      var btn = document.getElementById('dark-toggle');
+      if (btn) {
+        var theme = document.documentElement.getAttribute('data-theme') || 'light';
+        btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        btn.addEventListener('click', function() {
+          var current = document.documentElement.getAttribute('data-theme');
+          var next = current === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', next);
+          localStorage.setItem('theme', next);
+          btn.textContent = next === 'dark' ? '☀️' : '🌙';
+        });
+      }
     })();
   </script>
 </body>
@@ -431,6 +495,7 @@ function renderDashboard(state) {
             ${isActive ? 'Monitor Ativo' : 'Monitor Pausado'}
           </span>
           <span class="refresh-pill">&#8635; <span id="refresh-countdown">30s</span></span>
+          <button class="dark-toggle" id="dark-toggle" title="Alternar tema">🌙</button>
         </div>
       </div>
     </div>

@@ -177,7 +177,14 @@ class MonitorWorker {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), CHECK_TIMEOUT_MS);
       try {
-        const response = await fetch(link.url, { signal: controller.signal });
+        const response = await fetch(link.url, {
+          signal: controller.signal,
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'pt-BR,pt;q=0.9'
+          }
+        });
         if (response.ok) {
           const html = await response.text();
           if (html.length > 200) return classifyStatus(html);
