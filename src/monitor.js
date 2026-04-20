@@ -108,10 +108,7 @@ class MonitorWorker {
         continue;
       }
 
-      for (const link of activeLinks) {
-        if (stopRequested) break;
-        await this.checkOne(link);
-      }
+      await Promise.all(activeLinks.map((link) => this.checkOne(link)));
 
       await sleep(intervalMs);
     }
